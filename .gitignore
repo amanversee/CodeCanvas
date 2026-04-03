@@ -1,0 +1,18 @@
+# Root level ignores
+node_modules/
+package-lock.json
+
+# Backend ignores
+backend/node_modules/
+backend/.env
+
+# Frontend ignores
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# IDE and System files
+.vscode/
+.idea/
+.DS_Store
+*.log
