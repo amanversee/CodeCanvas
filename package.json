@@ -1,6 +1,7 @@
 {
   "name": "ai-resume-builder-root",
   "version": "1.0.0",
+  "private": true,
   "engines": {
     "node": ">=18"
   },
@@ -11,8 +12,10 @@
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
     "build": "npm run build --workspace=frontend",
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "postinstall": "npm install --workspaces"
   },
+  "dependencies": {},
   "devDependencies": {
     "concurrently": "^8.2.2"
   }
