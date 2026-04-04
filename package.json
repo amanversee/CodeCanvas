@@ -4,10 +4,14 @@
   "engines": {
     "node": ">=18"
   },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "install-all": "yarn --cwd backend install && yarn --cwd frontend install",
-    "start": "concurrently \"yarn --cwd backend start\" \"yarn --cwd frontend dev\"",
-    "dev": "concurrently \"yarn --cwd backend dev\" \"yarn --cwd frontend dev\""
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=frontend",
+    "start": "node backend/server.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
