@@ -38,11 +38,6 @@ app.use('/api/upload', require('./routes/upload'));
 // Health Check for Render
 app.get('/health', (req, res) => res.status(200).send('API is running successfully 🚀'));
 
-// Handle undefined API routes
-app.use('/api/*', (req, res) => {
-    res.status(404).json({ success: false, message: 'API route not found' });
-});
-
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
     // Serve static files from the frontend build
