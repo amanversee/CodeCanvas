@@ -56,8 +56,19 @@ if (process.env.NODE_ENV === 'production') {
 // Error handling middleware
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const startServer = (port) => {
+    const server = app.listen(port, '0.0.0.0', () => {
+        console.log(`Server running on port ${port} 🚀`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Port ${port} is in use, trying ${port + 1}...`);
+            startServer(port + 1);
+        } else {
+            console.error(err);
+        }
+    });
+};
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+const DEFAULT_PORT = process.env.PORT || 5001;
+startServer(parseInt(DEFAULT_PORT));
+

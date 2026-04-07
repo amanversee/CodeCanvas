@@ -8,7 +8,7 @@ import { PlusIcon, DocumentDuplicateIcon, TrashIcon, PencilIcon } from '@heroico
 import { templates } from '../components/editor/TemplateSelector';
 
 const Dashboard = () => {
-    const { user, isAuthenticated } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
     const navigate = useNavigate();
     const [resumes, setResumes] = useState([]);
     const [loading, setLoading] = useState(true);

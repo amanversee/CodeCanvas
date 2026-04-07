@@ -4,8 +4,12 @@ const connectDB = () => {
     mongoose.connect(process.env.MONGO_URI)
         .then(() => console.log("MongoDB connected"))
         .catch(err => {
-            console.error("MongoDB error:", err);
-            process.exit(1);
+            console.error("CRITICAL: MongoDB Connection Error ❌");
+            console.error("Error Message:", err.message);
+            if (err.name === 'MongooseServerSelectionError') {
+                console.error("⚠️ WARNING: MongoDB connection failed. Database features will be unavailable.");
+                console.error("Check if your IP address is whitelisted on MongoDB Atlas.");
+            }
         });
 };
 

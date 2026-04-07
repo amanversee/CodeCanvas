@@ -1,0 +1,24 @@
+﻿diff --git a/frontend/src/components/editor/TemplateSelector.jsx b/frontend/src/components/editor/TemplateSelector.jsx
+index e177edc..4fcc5ba 100644
+--- a/frontend/src/components/editor/TemplateSelector.jsx
++++ b/frontend/src/components/editor/TemplateSelector.jsx
+@@ -1,5 +1,6 @@
+ import React from 'react';
+ 
++// eslint-disable-next-line react-refresh/only-export-components
+ export const templates = [
+     {
+         id: 'modern',
+diff --git a/frontend/src/pages/Dashboard.jsx b/frontend/src/pages/Dashboard.jsx
+index fd9abc6..5e23243 100644
+--- a/frontend/src/pages/Dashboard.jsx
++++ b/frontend/src/pages/Dashboard.jsx
+@@ -8,7 +8,7 @@ import { PlusIcon, DocumentDuplicateIcon, TrashIcon, PencilIcon } from '@heroico
+ import { templates } from '../components/editor/TemplateSelector';
+ 
+ const Dashboard = () => {
+-    const { user, isAuthenticated } = useAuthStore();
++    const { isAuthenticated } = useAuthStore();
+     const navigate = useNavigate();
+     const [resumes, setResumes] = useState([]);
+     const [loading, setLoading] = useState(true);

@@ -33,7 +33,7 @@ exports.optimizeContent = async (req, res) => {
         }
 
         const prompt = `You are a professional resume writer and career coach.\n\n${promptText}`;
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(prompt);
         const optimizedText = result.response.text().trim();
 
