@@ -54,6 +54,7 @@ const Editor = () => {
     const [activeTab, setActiveTab] = useState('personal');
     const [resumeData, setResumeData] = useState(initialResumeState);
     const [loading, setLoading] = useState(id ? true : false);
+    const [showPreviewMobile, setShowPreviewMobile] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated) return navigate('/login');
@@ -161,9 +162,16 @@ const Editor = () => {
     const handlePrint = useReactToPrint({
         contentRef: componentRef,
         documentTitle: resumeData.title || 'Resume',
+        onBeforePrint: () => {
+             // You can add logic here if needed before print triggers
+             return Promise.resolve();
+        },
         pageStyle: `
-            @page { size: A4; margin: 0; }
-            @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+            @page { size: A4; margin: 0mm; }
+            @media print { 
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; }
+                .print-scale { width: 210mm !important; min-height: 297mm !important; transform: none !important; }
+            }
         `
     });
 
@@ -257,16 +265,26 @@ const Editor = () => {
                     </div>
 
                     <ThemeToggle />
-                    <Button variant="secondary" onClick={handlePrint}>Download PDF</Button>
-                    {id && <Button variant="secondary" onClick={handleSaveAsNew}>Save As New</Button>}
+                    <button 
+                        onClick={() => setShowPreviewMobile(!showPreviewMobile)}
+                        className="md:hidden flex items-center justify-center p-2 rounded-md bg-gray-100 dark:bg-dark-border text-gray-700 dark:text-gray-200"
+                    >
+                        {showPreviewMobile ? (
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        ) : (
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        )}
+                    </button>
+                    <Button variant="secondary" onClick={handlePrint} className="hidden sm:inline-flex">Download PDF</Button>
+                    {id && <Button variant="secondary" onClick={handleSaveAsNew} className="hidden lg:inline-flex">Save As New</Button>}
                     <Button onClick={handleSave}>{id ? 'Save' : 'Create'}</Button>
                 </div>
             </header>
 
             {/* Main Editor Split */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden relative">
                 {/* Sidebar Controls */}
-                <div className="w-1/3 min-w-[350px] max-w-[500px] bg-white dark:bg-dark-surface border-r border-gray-200 dark:border-dark-border flex flex-col shrink-0 flex-grow-0 transition-colors duration-200">
+                <div className={`${showPreviewMobile ? 'hidden' : 'flex'} w-full md:w-1/3 md:min-w-[350px] md:max-w-[500px] bg-white dark:bg-dark-surface border-r border-gray-200 dark:border-dark-border flex-col shrink-0 flex-grow-0 transition-colors duration-200`}>
                     <div className="flex border-b border-gray-200 dark:border-dark-border overflow-x-auto custom-scrollbar">
                         {tabs.map(tab => (
                             <button
@@ -294,11 +312,21 @@ const Editor = () => {
                 </div>
 
                 {/* Live Preview Pane */}
-                <div className="flex-1 bg-gray-200 dark:bg-[#0f172a] p-8 overflow-y-auto flex justify-center transition-colors duration-200">
-                    <div ref={componentRef} className="bg-white shadow-2xl print:shadow-none print:w-full print:max-w-none">
+                <div className={`${showPreviewMobile ? 'flex' : 'hidden md:flex'} flex-1 bg-gray-200 dark:bg-[#0f172a] p-4 md:p-8 overflow-y-auto justify-center transition-colors duration-200`}>
+                    <div ref={componentRef} className="bg-white shadow-2xl print:shadow-none print:w-full print:max-w-none origin-top transition-transform duration-200">
                         <ActiveTemplate />
                     </div>
                 </div>
+
+                {/* Floating Download Button for Mobile */}
+                {showPreviewMobile && (
+                    <button 
+                        onClick={handlePrint}
+                        className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary-600 text-white rounded-full shadow-lg flex items-center justify-center z-50 animate-bounce"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    </button>
+                )}
             </div>
         </div>
     );
