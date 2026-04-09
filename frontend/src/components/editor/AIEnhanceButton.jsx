@@ -9,7 +9,7 @@ const AIEnhanceButton = ({ text, type, onOptimize }) => {
 
     const handleEnhance = async () => {
         if (!text || text.trim().length < 10) {
-            alert("Please write a few words first before enhancing.");
+            alert('Please write a few words first before enhancing.');
             return;
         }
 
@@ -21,14 +21,30 @@ const AIEnhanceButton = ({ text, type, onOptimize }) => {
                 },
             };
 
-            const response = await axios.post(`${API_URL}/ai/optimize`, { text, type }, config);
+            const response = await axios.post(
+                `${API_URL}/ai/optimize`,
+                { text, type },
+                config
+            );
 
             if (response.data.success) {
                 onOptimize(response.data.optimizedText);
             }
         } catch (error) {
-            console.error("Failed to optimize:", error);
-            alert("Failed to enhance text. Please check your connection or AI limit.");
+            console.error('[AIEnhanceButton] Optimization failed:', error);
+
+            // Check if the server signals all keys are exhausted
+            const serverData = error.response?.data;
+            if (serverData?.allKeysFailed) {
+                alert(
+                    'Gemini API key is not working properly. Please check your API configuration.'
+                );
+            } else {
+                alert(
+                    serverData?.message ||
+                    'Failed to enhance text. Please check your connection or AI limit.'
+                );
+            }
         } finally {
             setLoading(false);
         }

@@ -1,12 +1,20 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
+/**
+ * @desc    Register a new user
+ * @route   POST /api/auth/register
+ * @access  Public
+ */
 exports.register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
+
+        // Check if user already exists
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ success: false, message: 'User already exists' });
+        }
 
         // Create user
         const user = await User.create({
@@ -21,9 +29,11 @@ exports.register = async (req, res) => {
     }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+/**
+ * @desc    Login user and return JWT
+ * @route   POST /api/auth/login
+ * @access  Public
+ */
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -53,9 +63,11 @@ exports.login = async (req, res) => {
     }
 };
 
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
+/**
+ * @desc    Get current authenticated user profile
+ * @route   GET /api/auth/me
+ * @access  Private
+ */
 exports.getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -68,7 +80,12 @@ exports.getMe = async (req, res) => {
     }
 };
 
-// Get token from model, create cookie and send response
+/**
+ * Create JWT, sign it, and send response
+ * @param {Object} user - User document
+ * @param {number} statusCode - HTTP status code
+ * @param {Object} res - Express response object
+ */
 const sendTokenResponse = (user, statusCode, res) => {
     // Create token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {

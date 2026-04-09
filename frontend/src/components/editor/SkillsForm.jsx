@@ -54,7 +54,13 @@ const SkillsForm = ({ resumeData, setResumeData }) => {
                 });
             }
         } catch (err) {
-            alert('Failed to optimize skills: ' + (err.response?.data?.message || err.message));
+            console.error('[SkillsForm] AI optimize failed:', err);
+            const serverData = err.response?.data;
+            if (serverData?.allKeysFailed) {
+                alert('Gemini API key is not working properly. Please check your API configuration.');
+            } else {
+                alert('Failed to optimize skills: ' + (serverData?.message || err.message));
+            }
         } finally {
             setIsOptimizing(false);
         }

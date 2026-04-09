@@ -8,17 +8,7 @@ import ExperienceForm from '../components/editor/ExperienceForm';
 import EducationForm from '../components/editor/EducationForm';
 import SkillsForm from '../components/editor/SkillsForm';
 import ProjectsForm from '../components/editor/ProjectsForm';
-import TemplateSelector from '../components/editor/TemplateSelector';
-import ClassicTemplate from '../components/templates/ClassicTemplate';
-import MinimalTemplate from '../components/templates/MinimalTemplate';
-import ModernTemplate from '../components/templates/ModernTemplate';
-import CorporateTemplate from '../components/templates/CorporateTemplate';
-import CreativeTemplate from '../components/templates/CreativeTemplate';
-import ExecutiveTemplate from '../components/templates/ExecutiveTemplate';
-import ProfessionalTemplate from '../components/templates/ProfessionalTemplate';
-import ElegantTemplate from '../components/templates/ElegantTemplate';
-import PortfolioTemplate from '../components/templates/PortfolioTemplate';
-import GradientTemplate from '../components/templates/GradientTemplate';
+import ResumePreview from '../components/preview/ResumePreview';
 import ThemeToggle from '../components/ThemeToggle';
 import { useReactToPrint } from 'react-to-print';
 import axios from 'axios';
@@ -163,7 +153,6 @@ const Editor = () => {
         contentRef: componentRef,
         documentTitle: resumeData.title || 'Resume',
         onBeforePrint: () => {
-             // You can add logic here if needed before print triggers
              return Promise.resolve();
         },
         pageStyle: `
@@ -184,33 +173,7 @@ const Editor = () => {
         { id: 'projects', label: 'Projects' }
     ];
 
-    const ActiveTemplate = () => {
-        switch (resumeData.templateId) {
-            case 'classic':
-                return <ClassicTemplate data={resumeData} />;
-            case 'minimal':
-                return <MinimalTemplate data={resumeData} />;
-            case 'corporate':
-                return <CorporateTemplate data={resumeData} />;
-            case 'creative':
-                return <CreativeTemplate data={resumeData} />;
-            case 'executive':
-                return <ExecutiveTemplate data={resumeData} />;
-            case 'professional':
-                return <ProfessionalTemplate data={resumeData} />;
-            case 'elegant':
-                return <ElegantTemplate data={resumeData} />;
-            case 'portfolio':
-                return <PortfolioTemplate data={resumeData} />;
-            case 'gradient':
-                return <GradientTemplate data={resumeData} />;
-            case 'modern':
-            default:
-                return <ModernTemplate data={resumeData} />;
-        }
-    };
-
-    if (loading) return <div className="p-10 text-center">Loading editor...</div>;
+    if (loading) return <div className="p-10 text-center text-gray-900 dark:text-white">Loading editor...</div>;
 
     return (
         <div className="h-screen flex flex-col bg-gray-100 dark:bg-dark-base overflow-hidden transition-colors duration-200">
@@ -301,7 +264,6 @@ const Editor = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-dark-base transition-colors duration-200">
-                        {/* Form Content goes here based on active tab */}
                         {activeTab === 'personal' && <PersonalInfoForm resumeData={resumeData} setResumeData={setResumeData} />}
                         {activeTab === 'summary' && <SummaryForm resumeData={resumeData} setResumeData={setResumeData} />}
                         {activeTab === 'experience' && <ExperienceForm resumeData={resumeData} setResumeData={setResumeData} />}
@@ -314,7 +276,7 @@ const Editor = () => {
                 {/* Live Preview Pane */}
                 <div className={`${showPreviewMobile ? 'flex' : 'hidden md:flex'} flex-1 bg-gray-200 dark:bg-[#0f172a] p-4 md:p-8 overflow-y-auto justify-center transition-colors duration-200`}>
                     <div ref={componentRef} className="bg-white shadow-2xl print:shadow-none print:w-full print:max-w-none origin-top transition-transform duration-200">
-                        <ActiveTemplate />
+                        <ResumePreview data={resumeData} />
                     </div>
                 </div>
 

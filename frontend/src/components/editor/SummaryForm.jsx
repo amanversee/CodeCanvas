@@ -24,7 +24,13 @@ const SummaryForm = ({ resumeData, setResumeData }) => {
 
             setResumeData({ ...resumeData, summary: res.data.optimizedText });
         } catch (err) {
-            alert('Failed to optimize text: ' + (err.response?.data?.message || err.message));
+            console.error('[SummaryForm] AI optimize failed:', err);
+            const serverData = err.response?.data;
+            if (serverData?.allKeysFailed) {
+                alert('Gemini API key is not working properly. Please check your API configuration.');
+            } else {
+                alert('Failed to optimize text: ' + (serverData?.message || err.message));
+            }
         } finally {
             setIsOptimizing(false);
         }
