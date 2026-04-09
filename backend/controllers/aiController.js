@@ -1,6 +1,40 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// List of backup keys from the user
+const BACKUP_KEYS = [
+    process.env.GEMINI_API_KEY, // Primary from .env
+    'AIzaSyAayQ4REleog7hlNKDb1_v_vBWU_XnF6MM',
+    'AIzaSyCODMuhnCt6O_6I317kRvq-fJTl5Ury3Go',
+    'AIzaSyCRi_wbicm57dnIx0CZyqDEjj7hqc82uqY',
+    'AIzaSyBfimeglEe-5RBzFoZqLZ5FALqiWj3WsG0'
+].filter(Boolean); // Remove null/undefined
+
+// Models to try in order of preference
+const MODELS_TO_TRY = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro", "gemini-1.0-pro"];
+
+// Helper to get working AI response
+const getAIResponse = async (prompt) => {
+    let lastError = null;
+
+    // Try each key
+    for (const key of BACKUP_KEYS) {
+        const genAI = new GoogleGenerativeAI(key);
+        
+        // Try each model
+        for (const modelName of MODELS_TO_TRY) {
+            try {
+                const model = genAI.getGenerativeModel({ model: modelName });
+                const result = await model.generateContent(prompt);
+                return result.response.text();
+            } catch (err) {
+                lastError = err;
+                console.warn(`AI Attempt failed (Key: ${key.substring(0, 10)}..., Model: ${modelName}): ${err.message}`);
+                // Continue to next model/key
+            }
+        }
+    }
+    throw lastError || new Error("All AI enrichment attempts failed");
+};
 
 // @desc    Optimize resume section content
 // @route   POST /api/ai/optimize
@@ -33,13 +67,13 @@ exports.optimizeContent = async (req, res) => {
         }
 
         const prompt = `You are a professional resume writer and career coach.\n\n${promptText}`;
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const result = await model.generateContent(prompt);
-        const optimizedText = result.response.text().trim();
+        
+        const optimizedTextRaw = await getAIResponse(prompt);
+        const optimizedText = optimizedTextRaw.trim();
 
         res.status(200).json({ success: true, optimizedText });
     } catch (err) {
-        console.error('AI Optimization Error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to optimize content. Check API key or limit.', error: err.message });
+        console.error('AI Optimization Final Error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to optimize content. All API keys or limits exhausted.', error: err.message });
     }
 };
